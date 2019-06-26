@@ -9,11 +9,13 @@
     "hs": "hs"
   },
   "dependencies": {
+    "@types/handlebars": "^3.0.28",
+    "@types/jquery": "^2.0.53",
     "director": "~1.2.2",
-    "jquery": "~2.1.1",
     "handlebars": "~2.0.0",
-    "todomvc-common": "~1.0.1",
-    "todomvc-app-css": "~1.0.1"
+    "jquery": "~2.1.1",
+    "todomvc-app-css": "~1.0.1",
+    "todomvc-common": "~1.0.1"
   },
   "devDependencies": {
     "file-loader": "=1.1.9",
