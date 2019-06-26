@@ -1,3 +1,4 @@
+console.log('fff');
 /*global jQuery, Handlebars, Router */
 console.log('TEST')
 jQuery(function ($) {
