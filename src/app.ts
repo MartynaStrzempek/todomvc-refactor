@@ -1,4 +1,3 @@
-console.log('fff');
 /*global jQuery, Handlebars, Router */
 jQuery(function ($) {
 	'use strict';
