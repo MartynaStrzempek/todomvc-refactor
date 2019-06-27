@@ -1,5 +1,5 @@
 import { Storage } from "./Storage";
-import * as api from './api'
+import * as api from './api';
 import { Todo } from "../types/types";
 
 export class RestStorage implements Storage {
