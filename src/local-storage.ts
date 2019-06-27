@@ -1,6 +1,5 @@
 import { Storage } from "./Storage";
 import { Todo } from "../types/types";
-import { Promise } from 'es6-promise'
 
 const LOCAL_STORAGE_TODOS_KEY = 'todos-jquery';
 

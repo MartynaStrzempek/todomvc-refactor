@@ -26,7 +26,7 @@ jQuery(function ($) {
 		[StorageTypes.LOCAL_STORAGE]: new LocalStorage()
 	}
 
-	const selectedStorages: Storage[] = [allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]
+	const selectedStorages: Set<Storage> = new Set([allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]);
 	const todoModel = new TodoModel();
 
 	var App = {
@@ -54,13 +54,17 @@ jQuery(function ($) {
 				.on('focusout', '.edit', this.update.bind(this))
 				.on('click', '.destroy', this.destroy.bind(this));
 			$('#localStorageCheckbox')
-				.change(function() {
-					console.log('localStorageCheckbox', $(this).prop('checked'));
-				});
+				.change((event) => this.toggleStorageInSelected(event, allStorages.LOCAL_STORAGE));
 			$('#restStorageCheckbox')
-				.change(function() {
-					console.log('restStorageCheckbox', $(this).prop('checked'));
-				});
+				.change((event) => this.toggleStorageInSelected(event, allStorages.REST_STORAGE));
+		},
+		toggleStorageInSelected(event, storage: Storage) {
+				const checkedInput = (<HTMLInputElement>(event.target)).checked
+				if (checkedInput) {
+					selectedStorages.add(storage)						
+				} else {
+					selectedStorages.delete(storage)
+				}
 		},
 		render: function () {
 			const visibleTodos = todoModel.getFilteredTodos(this.filter);
@@ -169,7 +173,11 @@ jQuery(function ($) {
 			todoModel.getTodos().splice(this.indexFromEl(e.target), 1);
 			this.render();
 		}
+
+
 	};
 
 	App.init();
 });
+
+
