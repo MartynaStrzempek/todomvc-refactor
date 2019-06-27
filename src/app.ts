@@ -105,8 +105,8 @@ jQuery(function ($) {
 			}
 		},
 		create: function (e) {
-			var $input = $(e.target);
-			var val = $input.val().trim();
+			const $input = $(e.target);
+			const val = $input.val().trim();
 
 			if (e.which !== ENTER_KEY || !val) {
 				return;
@@ -123,12 +123,12 @@ jQuery(function ($) {
 			this.render();
 		},
 		toggle: function (e) {
-			var i = this.indexFromEl(e.target);
+			const i = this.indexFromEl(e.target);
 			this.todos[i].completed = !this.todos[i].completed;
 			this.render();
 		},
 		edit: function (e) {
-			var $input = $(e.target).closest('li').addClass('editing').find('.edit');
+			const $input = $(e.target).closest('li').addClass('editing').find('.edit');
 			$input.val($input.val()).focus();
 		},
 		editKeyup: function (e) {
@@ -141,9 +141,9 @@ jQuery(function ($) {
 			}
 		},
 		update: function (e) {
-			var el = e.target;
-			var $el = $(el);
-			var val = $el.val().trim();
+			const el = e.target;
+			const $el = $(el);
+			const val = $el.val().trim();
 
 			if (!val) {
 				this.destroy(e);
