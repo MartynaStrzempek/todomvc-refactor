@@ -2,29 +2,16 @@ import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 import { pluralize, store, uuid } from "../utils/utils";
 import { TodoModel } from "./model";
 import {Filter, Todo} from "../types/types";
-import {Storage} from "./Storage";
-import {RestStorage} from "./RestStorage";
-import {LocalStorage} from "./local-storage";
+import {SyncMultipleStorage} from "./SyncMultipleStorage";
 
 declare const Router: any;
 const todoModel = new TodoModel();
-
-enum StorageTypes {
-  REST_STORAGE = 'REST_STORAGE',
-  LOCAL_STORAGE = 'LOCAL_STORAGE'
-}
-
-const allStorages: { [key in StorageTypes]: Storage} = {
-  [StorageTypes.REST_STORAGE]: new RestStorage(),
-  [StorageTypes.LOCAL_STORAGE]: new LocalStorage()
-};
-
-const selectedStorages: Set<Storage> = new Set([allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]);
 
 export class Controller {
   filter: Filter = "all";
   todoTemplate = Handlebars.compile($('#todo-template').html());
   footerTemplate = Handlebars.compile($('#footer-template').html());
+  syncMultipleStorage = new SyncMultipleStorage();
 
   init() {
     todoModel.setTodos(store('todos-jquery'));
@@ -49,18 +36,9 @@ export class Controller {
       .on('focusout', '.edit', this.update.bind(this))
       .on('click', '.destroy', this.destroy.bind(this));
     $('#localStorageCheckbox')
-      .change((event) => this.toggleStorageInSelected(event, allStorages.LOCAL_STORAGE));
+      .change((event) => this.syncMultipleStorage.toggleStorageInSelected(event, this.syncMultipleStorage.allStorages.LOCAL_STORAGE));
     $('#restStorageCheckbox')
-      .change((event) => this.toggleStorageInSelected(event, allStorages.REST_STORAGE));
-  }
-
-  toggleStorageInSelected(event, storage: Storage) {
-    const checkedInput = (<HTMLInputElement>(event.target)).checked
-    if (checkedInput) {
-      selectedStorages.add(storage)
-    } else {
-      selectedStorages.delete(storage)
-    }
+      .change((event) => this.syncMultipleStorage.toggleStorageInSelected(event, this.syncMultipleStorage.allStorages.REST_STORAGE));
   }
 
   render() {
@@ -99,7 +77,7 @@ export class Controller {
       completed: false
     };
     todoModel.setTodos([...todoModel.getTodos(), newTodo]);
-    selectedStorages.forEach(storage => { storage.createTodo(newTodo) })
+    this.syncMultipleStorage.createTodo(newTodo);
 
     $input.val('');
 
@@ -128,6 +106,7 @@ export class Controller {
   }
 
   destroyCompleted() {
+    this.syncMultipleStorage.destroyCompleted(todoModel.getFilteredTodos('completed'));
     todoModel.setTodos(todoModel.getActiveTodos());
     this.filter = 'all';
     this.render();
@@ -178,7 +157,7 @@ export class Controller {
     const todoToDestroyIndex = Controller.indexFromEl(e.target);
     const todoToDestroy = todos[todoToDestroyIndex];
     todos.splice(todoToDestroyIndex, 1);
-    selectedStorages.forEach(storage => storage.destroy(todoToDestroy.id))
+    this.syncMultipleStorage.destroy(todoToDestroy.id);
     this.render();
   }
 }
