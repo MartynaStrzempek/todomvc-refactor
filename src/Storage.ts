@@ -1,4 +1,4 @@
-type Todo = any
+import { Todo } from "../types/types";
 
 export interface Storage {
     getTodo(): Promise<Todo[]>,
