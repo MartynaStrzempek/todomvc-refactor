@@ -170,7 +170,10 @@ jQuery(function ($) {
 			this.render();
 		},
 		destroy: function (e) {
-			todoModel.getTodos().splice(this.indexFromEl(e.target), 1);
+			const todoToDestroyIndex = this.indexFromEl(e.target);
+			const todoToDestroy = this.todos[todoToDestroyIndex];
+			this.todos.splice(todoToDestroyIndex, 1);
+			selectedStorages.forEach(storage => storage.destroy(todoToDestroy.id))
 			this.render();
 		}
 
