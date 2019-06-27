@@ -1,18 +1,11 @@
 /*global jQuery, Handlebars, Router */
-import { RestStorage } from './RestStorage'
-import { LocalStorage } from './local-storage'
-import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
 import { Todo } from '../types/types';
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 import { TodoModel } from "./model";
+import { SyncMultipleStorage } from "./SyncMultipleStorage";
 
 declare const Router: any;
-
-enum StorageTypes {
-	REST_STORAGE = 'REST_STORAGE',
-	LOCAL_STORAGE = 'LOCAL_STORAGE'
-}
 
 jQuery(function ($) {
 	'use strict';
@@ -21,13 +14,8 @@ jQuery(function ($) {
 		return a === b ? options.fn(this) : options.inverse(this);
 	});
 
-	const allStorages: { [key in StorageTypes]: Storage} = {
-		[StorageTypes.REST_STORAGE]: new RestStorage(),
-		[StorageTypes.LOCAL_STORAGE]: new LocalStorage()
-	}
-
-	const selectedStorages: Set<Storage> = new Set([allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]);
 	const todoModel = new TodoModel();
+	const syncMultipleStorage = new SyncMultipleStorage();
 
 	var App = {
 		init: function () {
@@ -54,17 +42,9 @@ jQuery(function ($) {
 				.on('focusout', '.edit', this.update.bind(this))
 				.on('click', '.destroy', this.destroy.bind(this));
 			$('#localStorageCheckbox')
-				.change((event) => this.toggleStorageInSelected(event, allStorages.LOCAL_STORAGE));
+				.change((event) => this.toggleStorageInSelected(event, syncMultipleStorage.allStorages.LOCAL_STORAGE));
 			$('#restStorageCheckbox')
-				.change((event) => this.toggleStorageInSelected(event, allStorages.REST_STORAGE));
-		},
-		toggleStorageInSelected(event, storage: Storage) {
-				const checkedInput = (<HTMLInputElement>(event.target)).checked
-				if (checkedInput) {
-					selectedStorages.add(storage)						
-				} else {
-					selectedStorages.delete(storage)
-				}
+				.change((event) => this.toggleStorageInSelected(event, syncMultipleStorage.allStorages.REST_STORAGE));
 		},
 		render: function () {
 			const visibleTodos = todoModel.getFilteredTodos(this.filter);
@@ -125,9 +105,9 @@ jQuery(function ($) {
 				id: uuid(),
 				title: val,
 				completed: false
-			}
+			};
 			todoModel.setTodos([...todoModel.getTodos(), newTodo]);
-			selectedStorages.forEach(storage => { storage.createTodo(newTodo) })
+			syncMultipleStorage.createTodo(newTodo);
 
 			$input.val('');
 
@@ -174,7 +154,7 @@ jQuery(function ($) {
 			const todoToDestroyIndex = this.indexFromEl(e.target);
 			const todoToDestroy = todos[todoToDestroyIndex];
 			todos.splice(todoToDestroyIndex, 1);
-			selectedStorages.forEach(storage => storage.destroy(todoToDestroy.id))
+			syncMultipleStorage.destroy(todoToDestroy.id);
 			this.render();
 		}
 
