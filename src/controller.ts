@@ -1,8 +1,9 @@
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 import { pluralize, store, uuid } from "../utils/utils";
 import { TodoModel } from "./model";
-import {Filter, Todo} from "../types/types";
-import {SyncMultipleStorage} from "./SyncMultipleStorage";
+import { Filter, Todo } from "../types/types";
+import { SyncMultipleStorage } from "./SyncMultipleStorage";
+import * as $ from "jquery"
 
 declare const Router: any;
 const todoModel = new TodoModel();
