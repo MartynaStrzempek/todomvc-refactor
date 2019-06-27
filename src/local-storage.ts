@@ -4,56 +4,50 @@ import { Todo } from "../types/types";
 const LOCAL_STORAGE_TODOS_KEY = 'todos-jquery';
 
 export class LocalStorage implements Storage {
-    getTodos(): Promise<Todo[]> {
-        return new Promise((resolve) => resolve(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY))))
+    private dumpToLocalStorage = (todos: Todo[]): void => {
+        localStorage.setItem(LOCAL_STORAGE_TODOS_KEY, JSON.stringify(todos));
+    };
+
+    private loadFromLocalStorage = (): Todo[] => {
+        let store = localStorage.getItem(LOCAL_STORAGE_TODOS_KEY);
+        return (store && JSON.parse(store)) || [];
+    };
+
+    public getTodos(): Promise<Todo[]> {
+        return new Promise((resolve) => resolve(this.loadFromLocalStorage()));
     }
 
-    createTodo(todo: Todo): Promise<any> {
-        localStorage.setItem(
-            LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify([...JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)), todo])
-        );
+    public createTodo(todo: Todo): Promise<any> {
+        this.dumpToLocalStorage([...this.loadFromLocalStorage(), todo]);
         return new Promise((resolve) => resolve([]))
     }
 
-    update(todo: Todo): Promise<any> {
-        localStorage.setItem(
-            LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).map(lsTodo => {
-                if (todo.id === lsTodo.id) {
-                    lsTodo = todo;
-                }
-                return lsTodo
-            }))
-        );
+    public update(todo: Todo): Promise<any> {
+        this.dumpToLocalStorage(this.loadFromLocalStorage().map(lsTodo => {
+            if (todo.id === lsTodo.id) {
+                lsTodo = todo;
+            }
+            return lsTodo
+        }));
         return new Promise((resolve) => resolve([]))
     }
 
-    destroy(todoId: string): Promise<any> {
-        localStorage.setItem(
-            LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).filter(lsTodo => {
-                return lsTodo.id !== todoId
-            }))
-        );
+    public destroy(todoId: string): Promise<any> {
+        this.dumpToLocalStorage(this.loadFromLocalStorage().filter(lsTodo => {
+            return lsTodo.id !== todoId
+        }));
         return new Promise((resolve) => resolve([]))
     }
 
-    destroyCompleted(completedTodos: Todo[]): Promise<any> {
-        localStorage.setItem(
-            LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).filter(lsTodo => {
-                return !completedTodos.some(todo => lsTodo.id !== todo.id)
-            }))
-        );
+    public destroyCompleted(completedTodos: Todo[]): Promise<any> {
+        this.dumpToLocalStorage(this.loadFromLocalStorage().filter(lsTodo => {
+            return !completedTodos.some(todo => lsTodo.id !== todo.id)
+        }));
         return new Promise((resolve) => resolve([]))
     }
 
-    updateAll(todos: Todo[]): Promise<any> {
-        localStorage.setItem(
-            LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify(todos)
-        );
+    public updateAll(todos: Todo[]): Promise<any> {
+        this.dumpToLocalStorage(todos);
         return new Promise((resolve) => resolve([]))
     }
 }

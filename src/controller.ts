@@ -1,13 +1,10 @@
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
-import { pluralize, store, uuid } from "../utils/utils";
+import { pluralize, store } from "../utils/utils";
 import { TodoModel } from "./model";
-import {Filter, Todo} from "../types/types";
-import {SyncMultipleStorage} from "./SyncMultipleStorage";
-import { RestStorage } from './RestStorage'
-import { LocalStorage } from './local-storage'
-import { Storage } from './Storage';
+import { Filter, Todo } from "../types/types";
+import { SyncMultipleStorage } from "./SyncMultipleStorage";
 import { TodoFactory } from "./TodoFactory"
-
+import * as $ from "jquery"
 
 declare const Router: any;
 const todoModel = new TodoModel();
@@ -80,8 +77,8 @@ export class Controller {
       return;
     }
 
-    const newTodo: Todo = TodoFactory.createTodo(val)
-    todoModel.addTodo(newTodo)
+    const newTodo: Todo = TodoFactory.createTodo(val);
+    todoModel.addTodo(newTodo);
     this.syncMultipleStorage.createTodo(newTodo);
     $input.val('');
     this.render();
@@ -101,7 +98,7 @@ export class Controller {
 
   toggleAll(e): void {
     const isChecked = $(e.target).prop('checked');
-    todoModel.toggleCompletedOfAll(isChecked)
+    todoModel.toggleCompletedOfAll(isChecked);
     // storageModel.updateAll(todoModel.getAll)
     this.syncMultipleStorage.updateAll(todoModel.getTodos());
     this.render();
