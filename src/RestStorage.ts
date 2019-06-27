@@ -3,7 +3,7 @@ import * as api from './api'
 import { Todo } from "../types/types";
 
 export class RestStorage implements Storage {
-    getTodo(): Promise<Todo[]> {
+    getTodos(): Promise<Todo[]> {
         return api.getTodos();
     }    
     createTodo(todo: Todo): Promise<any> {
@@ -22,7 +22,7 @@ export class RestStorage implements Storage {
 
 export const RestStorageFunctional: () => Storage = () => {
     return {
-        getTodo(): Promise<Todo[]> {
+        getTodos(): Promise<Todo[]> {
             return api.getTodos();
         },    
         createTodo(todo: Todo): Promise<any> {
