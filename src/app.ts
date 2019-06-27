@@ -37,9 +37,9 @@ jQuery(function ($) {
 				.on('click', '.destroy', this.destroy.bind(this));
 		},
 		render: function () {
-			var todos = this.getFilteredTodos();
-			$('#todo-list').html(this.todoTemplate(todos));
-			$('#main').toggle(todos.length > 0);
+			const visibleTodos = this.getFilteredTodos();
+			$('#todo-list').html(this.todoTemplate(visibleTodos));
+			$('#main').toggle(visibleTodos.length > 0);
 			$('#toggle-all').prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			$('#new-todo').focus();
