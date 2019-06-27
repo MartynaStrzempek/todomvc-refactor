@@ -21,9 +21,9 @@ export class LocalStorage implements Storage {
             LOCAL_STORAGE_TODOS_KEY,
             JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).map(lsTodo => {
                 if (todo.id === lsTodo.id) {
-                    todo = lsTodo;
+                    lsTodo = todo;
                 }
-                return todo
+                return lsTodo
             }))
         );
         return new Promise((resolve) => resolve([]))
