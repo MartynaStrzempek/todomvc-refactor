@@ -126,7 +126,7 @@ jQuery(function ($) {
 				title: val,
 				completed: false
 			}
-			this.todos.push(newTodo);
+			todoModel.setTodos([...todoModel.getTodos(), newTodo]);
 			selectedStorages.forEach(storage => { storage.createTodo(newTodo) })
 
 			$input.val('');
@@ -170,9 +170,10 @@ jQuery(function ($) {
 			this.render();
 		},
 		destroy: function (e) {
+			const todos = todoModel.getTodos();
 			const todoToDestroyIndex = this.indexFromEl(e.target);
-			const todoToDestroy = this.todos[todoToDestroyIndex];
-			this.todos.splice(todoToDestroyIndex, 1);
+			const todoToDestroy = todos[todoToDestroyIndex];
+			todos.splice(todoToDestroyIndex, 1);
 			selectedStorages.forEach(storage => storage.destroy(todoToDestroy.id))
 			this.render();
 		}
