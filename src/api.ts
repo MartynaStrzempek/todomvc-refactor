@@ -15,6 +15,6 @@ export function putTodo(todo: Todo): Promise<Todo>{
     return axios.put(`${API_URL}/todos/${todo.id}`, todo);
 }
 
-export function deleteTodo(todoId: Todo['id']): Promise<Todo> {
+export function deleteTodo(todoId: Todo['id']): Promise<void> {
     return axios.delete(`${API_URL}/todos/${todoId}`);
 }

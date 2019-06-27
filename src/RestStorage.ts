@@ -18,6 +18,9 @@ export class RestStorage implements Storage {
     destroyCompleted(completedTodos: Todo[]): Promise<any> {
         return Promise.all(completedTodos.map(todo => api.deleteTodo(todo.id)))
     }
+    updateAll(todos: Todo[]): Promise<any> {
+        return Promise.all(todos.map(todo => api.putTodo(todo)));
+    }
 }
 
 export const RestStorageFunctional: () => Storage = () => {
@@ -36,6 +39,9 @@ export const RestStorageFunctional: () => Storage = () => {
         },
         destroyCompleted(completedTodos: Todo[]): Promise<any> {
             return Promise.all(completedTodos.map(todo => api.deleteTodo(todo.id)))
+        },
+        updateAll(todos: Todo[]): Promise<any> {
+            return Promise.all(todos.map(todo => api.putTodo(todo)));
         }
     }
 }

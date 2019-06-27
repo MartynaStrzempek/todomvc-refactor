@@ -33,6 +33,7 @@ export class SyncMultipleStorage implements Storage {
     }
 
     public update(todo: Todo): Promise<void> {
+        console.log('UPDATE')
         return Promise.all(Array.from(this.selectedStorages).map(storage => storage.update(todo))).then(e => e[0]);
     }
 
@@ -44,5 +45,8 @@ export class SyncMultipleStorage implements Storage {
         return Promise.all(Array.from(this.selectedStorages).map(storage => storage.destroyCompleted(completedTodos)))
             .then(e => e[0]);
     }
-
+    public updateAll(todos: Todo[]): Promise<void> {
+        return Promise.all(Array.from(this.selectedStorages).map(storage => storage.updateAll(todos)))
+            .then(e => e[0]);
+    }
 }

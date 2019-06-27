@@ -48,4 +48,12 @@ export class LocalStorage implements Storage {
         );
         return new Promise((resolve) => resolve([]))
     }
+
+    updateAll(todos: Todo[]): Promise<any> {
+        localStorage.setItem(
+            LOCAL_STORAGE_TODOS_KEY,
+            JSON.stringify(todos)
+        );
+        return new Promise((resolve) => resolve([]))
+    }
 }
