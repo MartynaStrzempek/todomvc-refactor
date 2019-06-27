@@ -70,7 +70,6 @@ export class Controller {
     $('#toggle-all').prop('checked', todoModel.getActiveTodos().length === 0);
     this.renderFooter();
     $('#new-todo').focus();
-    store('todos-jquery', todoModel.getTodos());
   }
 
   renderFooter() {
