@@ -1,7 +1,9 @@
 /*global jQuery, Handlebars, Router */
 import { RestStorage } from './RestStorage'
+import { LocalStorage } from './local-storage'
 import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
+import { Todo } from '../types/types';
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 import { TodoModel } from "./model";
 
@@ -21,11 +23,11 @@ jQuery(function ($) {
 
 	const allStorages: { [key in StorageTypes]: Storage} = {
 		[StorageTypes.REST_STORAGE]: new RestStorage(),
-		[StorageTypes.LOCAL_STORAGE]: new RestStorage()
-	};
+		[StorageTypes.LOCAL_STORAGE]: new LocalStorage()
+	}
 
+	const selectedStorages: Set<Storage> = new Set([allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]);
 	const todoModel = new TodoModel();
-	const storage: Storage = allStorages.REST_STORAGE;
 
 	var App = {
 		init: function () {
@@ -52,13 +54,17 @@ jQuery(function ($) {
 				.on('focusout', '.edit', this.update.bind(this))
 				.on('click', '.destroy', this.destroy.bind(this));
 			$('#localStorageCheckbox')
-				.change(function() {
-					console.log('localStorageCheckbox', $(this).prop('checked'));
-				});
+				.change((event) => this.toggleStorageInSelected(event, allStorages.LOCAL_STORAGE));
 			$('#restStorageCheckbox')
-				.change(function() {
-					console.log('restStorageCheckbox', $(this).prop('checked'));
-				});
+				.change((event) => this.toggleStorageInSelected(event, allStorages.REST_STORAGE));
+		},
+		toggleStorageInSelected(event, storage: Storage) {
+				const checkedInput = (<HTMLInputElement>(event.target)).checked
+				if (checkedInput) {
+					selectedStorages.add(storage)						
+				} else {
+					selectedStorages.delete(storage)
+				}
 		},
 		render: function () {
 			const visibleTodos = todoModel.getFilteredTodos(this.filter);
@@ -115,13 +121,13 @@ jQuery(function ($) {
 				return;
 			}
 
-			todoModel.setTodos([...todoModel.getTodos(),
-				{
-					id: uuid(),
-					title: val,
-					completed: false
-				}
-			]);
+			const newTodo: Todo = {
+				id: uuid(),
+				title: val,
+				completed: false
+			}
+			todoModel.setTodos([...todoModel.getTodos(), newTodo]);
+			selectedStorages.forEach(storage => { storage.createTodo(newTodo) })
 
 			$input.val('');
 
@@ -164,10 +170,18 @@ jQuery(function ($) {
 			this.render();
 		},
 		destroy: function (e) {
-			todoModel.getTodos().splice(this.indexFromEl(e.target), 1);
+			const todos = todoModel.getTodos();
+			const todoToDestroyIndex = this.indexFromEl(e.target);
+			const todoToDestroy = todos[todoToDestroyIndex];
+			todos.splice(todoToDestroyIndex, 1);
+			selectedStorages.forEach(storage => storage.destroy(todoToDestroy.id))
 			this.render();
 		}
+
+
 	};
 
 	App.init();
 });
+
+

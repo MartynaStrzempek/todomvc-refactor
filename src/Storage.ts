@@ -3,11 +3,11 @@ import { Todo } from "../types/types";
 export interface Storage {
     getTodos(): Promise<Todo[]>,
 
-    createTodo(todo: Todo): Promise<any>
+    createTodo(todo: Todo): Promise<void>
 
-    update(todo: Todo): Promise<any>
+    update(todo: Todo): Promise<void>
 
-    destroy(id: Todo['id']): Promise<any>
+    destroy(id: Todo['id']): Promise<void>
 
-    destroyCompleted(completedTodos: Todo[]): Promise<any>
+    destroyCompleted(completedTodos: Todo[]): Promise<void>
 }
