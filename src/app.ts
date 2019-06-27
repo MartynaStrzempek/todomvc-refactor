@@ -1,7 +1,9 @@
 /*global jQuery, Handlebars, Router */
 import { RestStorage } from './RestStorage'
+import { LocalStorage } from './local-storage'
 import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
+import { Todo } from '../types/types';
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 import { TodoModel } from "./model";
 
@@ -21,11 +23,11 @@ jQuery(function ($) {
 
 	const allStorages: { [key in StorageTypes]: Storage} = {
 		[StorageTypes.REST_STORAGE]: new RestStorage(),
-		[StorageTypes.LOCAL_STORAGE]: new RestStorage()
-	};
+		[StorageTypes.LOCAL_STORAGE]: new LocalStorage()
+	}
 
+	const selectedStorages: Storage[] = [allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]
 	const todoModel = new TodoModel();
-	const storage: Storage = allStorages.REST_STORAGE;
 
 	var App = {
 		init: function () {
@@ -115,13 +117,13 @@ jQuery(function ($) {
 				return;
 			}
 
-			todoModel.setTodos([...todoModel.getTodos(),
-				{
-					id: uuid(),
-					title: val,
-					completed: false
-				}
-			]);
+			const newTodo: Todo = {
+				id: uuid(),
+				title: val,
+				completed: false
+			}
+			this.todos.push(newTodo);
+			selectedStorages.forEach(storage => { storage.createTodo(newTodo) })
 
 			$input.val('');
 
