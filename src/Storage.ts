@@ -9,5 +9,5 @@ export interface Storage {
 
     destroy(id: Todo['id']): Promise<any>
 
-    destroyCompleted(todos: Todo[]): Promise<any>
+    destroyCompleted(completedTodos: Todo[]): Promise<any>
 }
