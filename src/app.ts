@@ -1,7 +1,14 @@
 /*global jQuery, Handlebars, Router */
+import { RestStorage } from './RestStorage'
+import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
 
 declare const Router: any 
+
+enum StorageTypes {
+	REST_STORAGE = 'REST_STORAGE',
+	LOCAL_STORAGE = 'LOCAL_STORAGE'
+}
 
 jQuery(function ($) {
 	'use strict';
@@ -9,6 +16,13 @@ jQuery(function ($) {
 	Handlebars.registerHelper('eq', function (a, b, options) {
 		return a === b ? options.fn(this) : options.inverse(this);
 	});
+
+	const allStorages: { [key in StorageTypes]: Storage} = {
+		[StorageTypes.REST_STORAGE]: new RestStorage(),
+		[StorageTypes.LOCAL_STORAGE]: new RestStorage()
+	}
+
+	const storage: Storage = allStorages.REST_STORAGE
 
 	var ENTER_KEY = 13;
 	var ESCAPE_KEY = 27;
