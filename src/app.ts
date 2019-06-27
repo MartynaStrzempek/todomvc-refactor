@@ -51,6 +51,14 @@ jQuery(function ($) {
 				.on('keyup', '.edit', this.editKeyup.bind(this))
 				.on('focusout', '.edit', this.update.bind(this))
 				.on('click', '.destroy', this.destroy.bind(this));
+			$('#localStorageCheckbox')
+				.change(function() {
+					console.log('localStorageCheckbox', $(this).prop('checked'));
+				});
+			$('#restStorageCheckbox')
+				.change(function() {
+					console.log('restStorageCheckbox', $(this).prop('checked'));
+				});
 		},
 		render: function () {
 			var todos = this.getFilteredTodos();
