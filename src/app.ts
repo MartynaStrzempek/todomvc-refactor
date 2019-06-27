@@ -2,8 +2,9 @@
 import { RestStorage } from './RestStorage'
 import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
+import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 
-declare const Router: any 
+declare const Router: any;
 
 enum StorageTypes {
 	REST_STORAGE = 'REST_STORAGE',
@@ -16,16 +17,13 @@ jQuery(function ($) {
 	Handlebars.registerHelper('eq', function (a, b, options) {
 		return a === b ? options.fn(this) : options.inverse(this);
 	});
-
+	
 	const allStorages: { [key in StorageTypes]: Storage} = {
 		[StorageTypes.REST_STORAGE]: new RestStorage(),
 		[StorageTypes.LOCAL_STORAGE]: new RestStorage()
 	}
 
 	const storage: Storage = allStorages.REST_STORAGE
-
-	var ENTER_KEY = 13;
-	var ESCAPE_KEY = 27;
 
 	var App = {
 		init: function () {
@@ -61,18 +59,18 @@ jQuery(function ($) {
 				});
 		},
 		render: function () {
-			var todos = this.getFilteredTodos();
-			$('#todo-list').html(this.todoTemplate(todos));
-			$('#main').toggle(todos.length > 0);
+			const visibleTodos = this.getFilteredTodos();
+			$('#todo-list').html(this.todoTemplate(visibleTodos));
+			$('#main').toggle(visibleTodos.length > 0);
 			$('#toggle-all').prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			$('#new-todo').focus();
 			store('todos-jquery', this.todos);
 		},
 		renderFooter: function () {
-			var todoCount = this.todos.length;
-			var activeTodoCount = this.getActiveTodos().length;
-			var template = this.footerTemplate({
+			const todoCount = this.todos.length;
+			const activeTodoCount = this.getActiveTodos().length;
+			const template = this.footerTemplate({
 				activeTodoCount: activeTodoCount,
 				activeTodoWord: pluralize(activeTodoCount, 'item'),
 				completedTodos: todoCount - activeTodoCount,
@@ -82,9 +80,9 @@ jQuery(function ($) {
 			$('#footer').toggle(todoCount > 0).html(template);
 		},
 		toggleAll: function (e) {
-			var isChecked = $(e.target).prop('checked');
+			const isChecked = $(e.target).prop('checked');
 
-			this.todos.forEach(function (todo) {
+			this.todos.forEach((todo) => {
 				todo.completed = isChecked;
 			});
 
@@ -119,19 +117,18 @@ jQuery(function ($) {
 		// accepts an element from inside the `.item` div and
 		// returns the corresponding index in the `todos` array
 		indexFromEl: function (el) { //read
-			var id = $(el).closest('li').data('id');
-			var todos = this.todos;
-			var i = todos.length;
+			const id = $(el).closest('li').data('id');
+			let i = this.todos.length;
 
 			while (i--) {
-				if (todos[i].id === id) {
+				if (this.todos[i].id === id) {
 					return i;
 				}
 			}
 		},
 		create: function (e) {
-			var $input = $(e.target);
-			var val = $input.val().trim();
+			const $input = $(e.target);
+			const val = $input.val().trim();
 
 			if (e.which !== ENTER_KEY || !val) {
 				return;
@@ -148,12 +145,12 @@ jQuery(function ($) {
 			this.render();
 		},
 		toggle: function (e) {
-			var i = this.indexFromEl(e.target);
+			const i = this.indexFromEl(e.target);
 			this.todos[i].completed = !this.todos[i].completed;
 			this.render();
 		},
 		edit: function (e) {
-			var $input = $(e.target).closest('li').addClass('editing').find('.edit');
+			const $input = $(e.target).closest('li').addClass('editing').find('.edit');
 			$input.val($input.val()).focus();
 		},
 		editKeyup: function (e) {
@@ -166,9 +163,9 @@ jQuery(function ($) {
 			}
 		},
 		update: function (e) {
-			var el = e.target;
-			var $el = $(el);
-			var val = $el.val().trim();
+			const el = e.target;
+			const $el = $(el);
+			const val = $el.val().trim();
 
 			if (!val) {
 				this.destroy(e);
