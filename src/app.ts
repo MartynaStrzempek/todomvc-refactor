@@ -124,7 +124,7 @@ jQuery(function ($) {
 		},
 		// accepts an element from inside the `.item` div and
 		// returns the corresponding index in the `todos` array
-		indexFromEl: function (el) {
+		indexFromEl: function (el) { //read
 			var id = $(el).closest('li').data('id');
 			var todos = this.todos;
 			var i = todos.length;
