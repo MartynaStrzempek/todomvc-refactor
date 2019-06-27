@@ -3,7 +3,7 @@ import { RestStorage } from './RestStorage'
 import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
-import {TodoModel} from "./model";
+import { TodoModel } from "./model";
 
 declare const Router: any;
 
@@ -70,9 +70,9 @@ jQuery(function ($) {
 			store('todos-jquery', todoModel.getTodos());
 		},
 		renderFooter: function () {
-			var todoCount = todoModel.getTodos().length;
-			var activeTodoCount = todoModel.getActiveTodos().length;
-			var template = this.footerTemplate({
+			const todoCount = todoModel.getTodos().length;
+			const activeTodoCount = todoModel.getActiveTodos().length;
+			const template = this.footerTemplate({
 				activeTodoCount: activeTodoCount,
 				activeTodoWord: pluralize(activeTodoCount, 'item'),
 				completedTodos: todoCount - activeTodoCount,
