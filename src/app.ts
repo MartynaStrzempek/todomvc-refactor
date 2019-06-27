@@ -1,4 +1,5 @@
 /*global jQuery, Handlebars, Router */
+import { uuid, pluralize, store } from "../utils/utils";
 
 declare const Router: any 
 
@@ -14,7 +15,7 @@ jQuery(function ($) {
 
 	var App = {
 		init: function () {
-			this.todos = util.store('todos-jquery');
+			this.todos = store('todos-jquery');
 			this.todoTemplate = Handlebars.compile($('#todo-template').html());
 			this.footerTemplate = Handlebars.compile($('#footer-template').html());
 			this.bindEvents();
@@ -44,14 +45,14 @@ jQuery(function ($) {
 			$('#toggle-all').prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			$('#new-todo').focus();
-			// util.store('todos-jquery', this.todos);
+			store('todos-jquery', this.todos);
 		},
 		renderFooter: function () {
 			var todoCount = this.todos.length;
 			var activeTodoCount = this.getActiveTodos().length;
 			var template = this.footerTemplate({
 				activeTodoCount: activeTodoCount,
-				activeTodoWord: util.pluralize(activeTodoCount, 'item'),
+				activeTodoWord: pluralize(activeTodoCount, 'item'),
 				completedTodos: todoCount - activeTodoCount,
 				filter: this.filter
 			});
@@ -115,7 +116,7 @@ jQuery(function ($) {
 			}
 
 			this.todos.push({
-				id: util.uuid(),
+				id: uuid(),
 				title: val,
 				completed: false
 			});
