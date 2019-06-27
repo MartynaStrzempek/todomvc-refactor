@@ -1,7 +1,7 @@
 import { Todo } from "../types/types";
 
 export interface Storage {
-    getTodo(): Promise<Todo[]>,
+    getTodos(): Promise<Todo[]>,
 
     createTodo(todo: Todo): Promise<any>
 
