@@ -1,5 +1,8 @@
 /*global jQuery, Handlebars, Router */
 import {Controller} from './controller';
+import {Storage} from "./Storage";
+import {RestStorage} from "./RestStorage";
+import {LocalStorage} from "./local-storage";
 
 jQuery(function ($) {
 	'use strict';

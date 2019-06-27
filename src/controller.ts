@@ -1,10 +1,25 @@
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 import { pluralize, store, uuid } from "../utils/utils";
 import { TodoModel } from "./model";
-import { Filter } from "../types/types";
+import {Filter, Todo} from "../types/types";
+import {Storage} from "./Storage";
+import {RestStorage} from "./RestStorage";
+import {LocalStorage} from "./local-storage";
 
 declare const Router: any;
 const todoModel = new TodoModel();
+
+enum StorageTypes {
+  REST_STORAGE = 'REST_STORAGE',
+  LOCAL_STORAGE = 'LOCAL_STORAGE'
+}
+
+const allStorages: { [key in StorageTypes]: Storage} = {
+  [StorageTypes.REST_STORAGE]: new RestStorage(),
+  [StorageTypes.LOCAL_STORAGE]: new LocalStorage()
+};
+
+const selectedStorages: Set<Storage> = new Set([allStorages.REST_STORAGE, allStorages.LOCAL_STORAGE]);
 
 export class Controller {
   filter: Filter = "all";
@@ -34,13 +49,18 @@ export class Controller {
       .on('focusout', '.edit', this.update.bind(this))
       .on('click', '.destroy', this.destroy.bind(this));
     $('#localStorageCheckbox')
-      .change(function() {
-        console.log('localStorageCheckbox', $(this).prop('checked'));
-      });
+      .change((event) => this.toggleStorageInSelected(event, allStorages.LOCAL_STORAGE));
     $('#restStorageCheckbox')
-      .change(function() {
-        console.log('restStorageCheckbox', $(this).prop('checked'));
-      });
+      .change((event) => this.toggleStorageInSelected(event, allStorages.REST_STORAGE));
+  }
+
+  toggleStorageInSelected(event, storage: Storage) {
+    const checkedInput = (<HTMLInputElement>(event.target)).checked
+    if (checkedInput) {
+      selectedStorages.add(storage)
+    } else {
+      selectedStorages.delete(storage)
+    }
   }
 
   render() {
@@ -50,7 +70,6 @@ export class Controller {
     $('#toggle-all').prop('checked', todoModel.getActiveTodos().length === 0);
     this.renderFooter();
     $('#new-todo').focus();
-    store('todos-jquery', todoModel.getTodos());
   }
 
   renderFooter() {
@@ -74,13 +93,13 @@ export class Controller {
       return;
     }
 
-    todoModel.setTodos([...todoModel.getTodos(),
-      {
-        id: uuid(),
-        title: val,
-        completed: false
-      }
-    ]);
+    const newTodo: Todo = {
+      id: uuid(),
+      title: val,
+      completed: false
+    };
+    todoModel.setTodos([...todoModel.getTodos(), newTodo]);
+    selectedStorages.forEach(storage => { storage.createTodo(newTodo) })
 
     $input.val('');
 
@@ -155,7 +174,11 @@ export class Controller {
   }
 
   destroy(e) {
-    todoModel.getTodos().splice(Controller.indexFromEl(e.target), 1);
+    const todos = todoModel.getTodos();
+    const todoToDestroyIndex = Controller.indexFromEl(e.target);
+    const todoToDestroy = todos[todoToDestroyIndex];
+    todos.splice(todoToDestroyIndex, 1);
+    selectedStorages.forEach(storage => storage.destroy(todoToDestroy.id))
     this.render();
   }
 }
