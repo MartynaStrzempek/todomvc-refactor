@@ -46,9 +46,9 @@ jQuery(function ($) {
 			store('todos-jquery', this.todos);
 		},
 		renderFooter: function () {
-			var todoCount = this.todos.length;
-			var activeTodoCount = this.getActiveTodos().length;
-			var template = this.footerTemplate({
+			const todoCount = this.todos.length;
+			const activeTodoCount = this.getActiveTodos().length;
+			const template = this.footerTemplate({
 				activeTodoCount: activeTodoCount,
 				activeTodoWord: pluralize(activeTodoCount, 'item'),
 				completedTodos: todoCount - activeTodoCount,
@@ -58,9 +58,9 @@ jQuery(function ($) {
 			$('#footer').toggle(todoCount > 0).html(template);
 		},
 		toggleAll: function (e) {
-			var isChecked = $(e.target).prop('checked');
+			const isChecked = $(e.target).prop('checked');
 
-			this.todos.forEach(function (todo) {
+			this.todos.forEach((todo) => {
 				todo.completed = isChecked;
 			});
 
@@ -95,12 +95,11 @@ jQuery(function ($) {
 		// accepts an element from inside the `.item` div and
 		// returns the corresponding index in the `todos` array
 		indexFromEl: function (el) { //read
-			var id = $(el).closest('li').data('id');
-			var todos = this.todos;
-			var i = todos.length;
+			const id = $(el).closest('li').data('id');
+			let i = this.todos.length;
 
 			while (i--) {
-				if (todos[i].id === id) {
+				if (this.todos[i].id === id) {
 					return i;
 				}
 			}
