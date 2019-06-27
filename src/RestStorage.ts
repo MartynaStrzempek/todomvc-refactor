@@ -3,7 +3,7 @@ import * as api from './api'
 import { Todo } from "../types/types";
 
 export class RestStorage implements Storage {
-    getTodo(): Promise<Todo[]> {
+    getTodos(): Promise<Todo[]> {
         return api.getTodos();
     }    
     createTodo(todo: Todo): Promise<any> {
@@ -16,13 +16,13 @@ export class RestStorage implements Storage {
         return api.deleteTodo(id)
     }
     destroyCompleted(completedTodos: Todo[]): Promise<any> {
-        return Promise.all([completedTodos.map(todo => api.deleteTodo(todo.id))])
+        return Promise.all(completedTodos.map(todo => api.deleteTodo(todo.id)))
     }
 }
 
 export const RestStorageFunctional: () => Storage = () => {
     return {
-        getTodo(): Promise<Todo[]> {
+        getTodos(): Promise<Todo[]> {
             return api.getTodos();
         },    
         createTodo(todo: Todo): Promise<any> {
@@ -35,7 +35,7 @@ export const RestStorageFunctional: () => Storage = () => {
             return api.deleteTodo(id)
         },
         destroyCompleted(completedTodos: Todo[]): Promise<any> {
-            return Promise.all([completedTodos.map(todo => api.deleteTodo(todo.id))])
+            return Promise.all(completedTodos.map(todo => api.deleteTodo(todo.id)))
         }
     }
 }
