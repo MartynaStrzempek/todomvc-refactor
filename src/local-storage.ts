@@ -20,12 +20,12 @@ export class LocalStorage implements Storage {
     update(todo: Todo): Promise<any> {
         localStorage.setItem(
             LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify([...JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).map(lsTodo => {
+            JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).map(lsTodo => {
                 if (todo.id === lsTodo.id) {
                     todo = lsTodo;
                 }
                 return todo
-            })])
+            }))
         );
         return new Promise((resolve) => resolve([]))
     }
@@ -33,9 +33,9 @@ export class LocalStorage implements Storage {
     destroy(todoId: string): Promise<any> {
         localStorage.setItem(
             LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify([...JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).filter(lsTodo => {
+            JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).filter(lsTodo => {
                 return lsTodo.id !== todoId
-            })])
+            }))
         );
         return new Promise((resolve) => resolve([]))
     }
@@ -43,9 +43,9 @@ export class LocalStorage implements Storage {
     destroyCompleted(completedTodos: Todo[]): Promise<any> {
         localStorage.setItem(
             LOCAL_STORAGE_TODOS_KEY,
-            JSON.stringify([...JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).filter(lsTodo => {
+            JSON.stringify(JSON.parse(localStorage.getItem(LOCAL_STORAGE_TODOS_KEY)).filter(lsTodo => {
                 return !completedTodos.some(todo => lsTodo.id !== todo.id)
-            })])
+            }))
         );
         return new Promise((resolve) => resolve([]))
     }
