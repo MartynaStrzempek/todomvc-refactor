@@ -1,7 +1,8 @@
 /*global jQuery, Handlebars, Router */
 import { uuid, pluralize, store } from "../utils/utils";
+import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
 
-declare const Router: any 
+declare const Router: any;
 
 jQuery(function ($) {
 	'use strict';
@@ -9,9 +10,6 @@ jQuery(function ($) {
 	Handlebars.registerHelper('eq', function (a, b, options) {
 		return a === b ? options.fn(this) : options.inverse(this);
 	});
-
-	var ENTER_KEY = 13;
-	var ESCAPE_KEY = 27;
 
 	var App = {
 		init: function () {
