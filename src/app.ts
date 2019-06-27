@@ -2,6 +2,7 @@
 import { RestStorage } from './RestStorage'
 import { Storage } from './Storage';
 import { uuid, pluralize, store } from "../utils/utils";
+import {TodoModel} from "./model";
 
 declare const Router: any 
 
@@ -20,16 +21,17 @@ jQuery(function ($) {
 	const allStorages: { [key in StorageTypes]: Storage} = {
 		[StorageTypes.REST_STORAGE]: new RestStorage(),
 		[StorageTypes.LOCAL_STORAGE]: new RestStorage()
-	}
+	};
 
-	const storage: Storage = allStorages.REST_STORAGE
+	const todoModel = new TodoModel();
+	const storage: Storage = allStorages.REST_STORAGE;
 
 	var ENTER_KEY = 13;
 	var ESCAPE_KEY = 27;
 
 	var App = {
 		init: function () {
-			this.todos = store('todos-jquery');
+			todoModel.setTodos(store('todos-jquery'));
 			this.todoTemplate = Handlebars.compile($('#todo-template').html());
 			this.footerTemplate = Handlebars.compile($('#footer-template').html());
 			this.bindEvents();
@@ -61,17 +63,17 @@ jQuery(function ($) {
 				});
 		},
 		render: function () {
-			var todos = this.getFilteredTodos();
+			var todos = todoModel.getFilteredTodos(this.filter);
 			$('#todo-list').html(this.todoTemplate(todos));
 			$('#main').toggle(todos.length > 0);
-			$('#toggle-all').prop('checked', this.getActiveTodos().length === 0);
+			$('#toggle-all').prop('checked', todoModel.getActiveTodos().length === 0);
 			this.renderFooter();
 			$('#new-todo').focus();
-			store('todos-jquery', this.todos);
+			store('todos-jquery', todoModel.getTodos());
 		},
 		renderFooter: function () {
-			var todoCount = this.todos.length;
-			var activeTodoCount = this.getActiveTodos().length;
+			var todoCount = todoModel.getTodos().length;
+			var activeTodoCount = todoModel.getActiveTodos().length;
 			var template = this.footerTemplate({
 				activeTodoCount: activeTodoCount,
 				activeTodoWord: pluralize(activeTodoCount, 'item'),
@@ -84,35 +86,14 @@ jQuery(function ($) {
 		toggleAll: function (e) {
 			var isChecked = $(e.target).prop('checked');
 
-			this.todos.forEach(function (todo) {
+			todoModel.getTodos().forEach(function (todo) {
 				todo.completed = isChecked;
 			});
 
 			this.render();
 		},
-		getActiveTodos: function () {
-			return this.todos.filter(function (todo) {
-				return !todo.completed;
-			});
-		},
-		getCompletedTodos: function () {
-			return this.todos.filter(function (todo) {
-				return todo.completed;
-			});
-		},
-		getFilteredTodos: function () {
-			if (this.filter === 'active') {
-				return this.getActiveTodos();
-			}
-
-			if (this.filter === 'completed') {
-				return this.getCompletedTodos();
-			}
-
-			return this.todos;
-		},
 		destroyCompleted: function () {
-			this.todos = this.getActiveTodos();
+			todoModel.setTodos(todoModel.getActiveTodos());
 			this.filter = 'all';
 			this.render();
 		},
@@ -120,7 +101,7 @@ jQuery(function ($) {
 		// returns the corresponding index in the `todos` array
 		indexFromEl: function (el) { //read
 			var id = $(el).closest('li').data('id');
-			var todos = this.todos;
+			var todos = todoModel.getTodos();
 			var i = todos.length;
 
 			while (i--) {
@@ -137,11 +118,13 @@ jQuery(function ($) {
 				return;
 			}
 
-			this.todos.push({
-				id: uuid(),
-				title: val,
-				completed: false
-			});
+			todoModel.setTodos([...todoModel.getTodos(),
+				{
+					id: uuid(),
+					title: val,
+					completed: false
+				}
+			]);
 
 			$input.val('');
 
@@ -149,7 +132,7 @@ jQuery(function ($) {
 		},
 		toggle: function (e) {
 			var i = this.indexFromEl(e.target);
-			this.todos[i].completed = !this.todos[i].completed;
+			todoModel.getTodos()[i].completed = !todoModel.getTodos()[i].completed;
 			this.render();
 		},
 		edit: function (e) {
@@ -178,13 +161,13 @@ jQuery(function ($) {
 			if ($el.data('abort')) {
 				$el.data('abort', false);
 			} else {
-				this.todos[this.indexFromEl(el)].title = val;
+				todoModel.getTodos()[this.indexFromEl(el)].title = val;
 			}
 
 			this.render();
 		},
 		destroy: function (e) {
-			this.todos.splice(this.indexFromEl(e.target), 1);
+			todoModel.getTodos().splice(this.indexFromEl(e.target), 1);
 			this.render();
 		}
 	};
