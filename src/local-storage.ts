@@ -25,9 +25,9 @@ export class LocalStorage implements Storage {
     public update(todo: Todo): Promise<any> {
         this.dumpToLocalStorage(this.loadFromLocalStorage().map(lsTodo => {
             if (todo.id === lsTodo.id) {
-                todo = lsTodo;
+                lsTodo = todo;
             }
-            return todo
+            return lsTodo
         }));
         return new Promise((resolve) => resolve([]))
     }
@@ -43,6 +43,14 @@ export class LocalStorage implements Storage {
         this.dumpToLocalStorage(this.loadFromLocalStorage().filter(lsTodo => {
             return !completedTodos.some(todo => lsTodo.id !== todo.id)
         }));
+        return new Promise((resolve) => resolve([]))
+    }
+
+    updateAll(todos: Todo[]): Promise<any> {
+        localStorage.setItem(
+            LOCAL_STORAGE_TODOS_KEY,
+            JSON.stringify(todos)
+        );
         return new Promise((resolve) => resolve([]))
     }
 }

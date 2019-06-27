@@ -1,4 +1,4 @@
-import { Todo } from "../types/types";
+import { Todo } from "./Todo";
 
 export interface Storage {
     getTodos(): Promise<Todo[]>,
@@ -10,4 +10,6 @@ export interface Storage {
     destroy(id: Todo['id']): Promise<void>
 
     destroyCompleted(completedTodos: Todo[]): Promise<void>
+
+    updateAll(todos: Todo[]): Promise<void>
 }

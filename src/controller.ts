@@ -1,8 +1,9 @@
 import { ENTER_KEY, ESCAPE_KEY } from "../consts/consts";
-import { pluralize, store, uuid } from "../utils/utils";
+import { pluralize, store } from "../utils/utils";
 import { TodoModel } from "./model";
 import { Filter, Todo } from "../types/types";
 import { SyncMultipleStorage } from "./SyncMultipleStorage";
+import { TodoFactory } from "./TodoFactory"
 import * as $ from "jquery"
 
 declare const Router: any;
@@ -64,7 +65,11 @@ export class Controller {
     $('#footer').toggle(todoCount > 0).html(template);
   }
 
-  create(e) {
+  getIdFromElement (el): Todo['id'] {
+    return $(el).closest('li').data('id');
+  }
+
+  create (e) {
     const $input = $(e.target);
     const val = $input.val().trim();
 
@@ -72,22 +77,17 @@ export class Controller {
       return;
     }
 
-    const newTodo: Todo = {
-      id: uuid(),
-      title: val,
-      completed: false
-    };
-    todoModel.setTodos([...todoModel.getTodos(), newTodo]);
+    const newTodo: Todo = TodoFactory.createTodo(val);
+    todoModel.addTodo(newTodo);
     this.syncMultipleStorage.createTodo(newTodo);
-
     $input.val('');
-
     this.render();
   }
 
-  toggle(e) {
-    const i = Controller.indexFromEl(e.target);
-    todoModel.getTodos()[i].completed = !todoModel.getTodos()[i].completed;
+  toggle(e): void {
+    const todoToUpdate = todoModel.getTodoById(this.getIdFromElement(e.target));
+    todoToUpdate.completed = !todoToUpdate.completed;
+    this.syncMultipleStorage.update(todoToUpdate);
     this.render();
   }
 
@@ -96,18 +96,15 @@ export class Controller {
     $input.val($input.val()).focus();
   }
 
-  toggleAll(e) {
+  toggleAll(e): void {
     const isChecked = $(e.target).prop('checked');
-
-    todoModel.getTodos().forEach(function (todo) {
-      todo.completed = isChecked;
-    });
-
+    todoModel.toggleCompletedOfAll(isChecked);
+    // storageModel.updateAll(todoModel.getAll)
+    this.syncMultipleStorage.updateAll(todoModel.getTodos());
     this.render();
   }
-
-  destroyCompleted() {
-    this.syncMultipleStorage.destroyCompleted(todoModel.getFilteredTodos('completed'));
+  destroyCompleted(): void {
+    this.syncMultipleStorage.destroyCompleted(todoModel.getFilteredTodos('completed'))
     todoModel.setTodos(todoModel.getActiveTodos());
     this.filter = 'all';
     this.render();
@@ -134,8 +131,9 @@ export class Controller {
     }
   }
 
-  update(e) {
+  update(e): void {
     const el = e.target;
+    const todoToUpdate: Todo = todoModel.getTodoById(this.getIdFromElement(el))
     const $el = $(el);
     const val = $el.val().trim();
 
@@ -147,18 +145,16 @@ export class Controller {
     if ($el.data('abort')) {
       $el.data('abort', false);
     } else {
-      todoModel.getTodos()[Controller.indexFromEl(el)].title = val;
+      todoToUpdate.title = val;
+      this.syncMultipleStorage.update(todoToUpdate);
     }
 
     this.render();
   }
-
-  destroy(e) {
-    const todos = todoModel.getTodos();
-    const todoToDestroyIndex = Controller.indexFromEl(e.target);
-    const todoToDestroy = todos[todoToDestroyIndex];
-    todos.splice(todoToDestroyIndex, 1);
-    this.syncMultipleStorage.destroy(todoToDestroy.id);
+  destroy(e): void {
+    const todoToDestroy: Todo = todoModel.getTodoById(this.getIdFromElement(e.target))
+    todoModel.deleteTodo(todoToDestroy.id);
+    this.syncMultipleStorage.destroy(todoToDestroy.id)
     this.render();
   }
 }
